@@ -13,7 +13,7 @@ use http::{HttpWriter, LINE_ENDING};
 use http::HttpWriter::{ThroughWriter, ChunkedWriter, SizedWriter, EmptyWriter};
 use version;
 use HttpResult;
-use client::Response;
+use client::{Response, get_host_and_port};
 
 
 /// A client request to a remote server.
@@ -48,16 +48,7 @@ impl Request<Fresh> {
     /// Create a new client request with a specific underlying NetworkStream.
     pub fn with_stream<S: NetworkConnector>(method: method::Method, url: Url) -> HttpResult<Request<Fresh>> {
         debug!("{} {}", method, url);
-        let host = match url.serialize_host() {
-            Some(host) => host,
-            None => return Err(HttpUriError)
-        };
-        debug!("host={}", host);
-        let port = match url.port_or_default() {
-            Some(port) => port,
-            None => return Err(HttpUriError)
-        };
-        debug!("port={}", port);
+        let (host, port) = try!(get_host_and_port(&url));
 
         let stream: S = try!(NetworkConnector::connect((host[], port), url.scheme.as_slice()));
         let stream = ThroughWriter(BufferedWriter::new(box stream as Box<NetworkStream + Send>));
@@ -187,6 +178,7 @@ impl Request<Streaming> {
     ///
     /// Consumes the Request.
     pub fn send(self) -> HttpResult<Response> {
+        debug!("sending request");
         let raw = try!(self.body.end()).unwrap();
         Response::new(raw)
     }

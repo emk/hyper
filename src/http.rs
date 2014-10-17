@@ -613,7 +613,7 @@ fn expect(r: IoResult<u8>, expected: u8) -> HttpResult<()> {
 #[cfg(test)]
 mod tests {
     use std::io::{mod, MemReader, MemWriter};
-    use test::Bencher;
+    use libtest::Bencher;
     use uri::RequestUri;
     use uri::RequestUri::{Star, AbsoluteUri, AbsolutePath, Authority};
     use method;

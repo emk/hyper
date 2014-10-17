@@ -1,6 +1,6 @@
 #![feature(macro_rules, phase, default_type_params, if_let, slicing_syntax,
            tuple_indexing)]
-#![deny(missing_docs)]
+#![deny(missing_doc)]
 #![deny(warnings)]
 #![experimental]
 
@@ -131,7 +131,7 @@ extern crate time;
 extern crate url;
 extern crate openssl;
 #[phase(plugin,link)] extern crate log;
-#[cfg(test)] extern crate test;
+#[cfg(test)] extern crate "test" as libtest;
 extern crate "unsafe-any" as uany;
 extern crate typeable;
 extern crate cookie;
@@ -181,6 +181,10 @@ macro_rules! inspect(
         v
     })
 )
+
+#[cfg(test)]
+#[macro_escape]
+mod test;
 
 pub mod client;
 pub mod method;
